@@ -4,6 +4,7 @@ import { MapScreenComponent } from './screens/map-screen/map-screen.component';
 import { MapViewComponent } from './components/map-view/map-view.component';
 import { LoadingComponent } from './components/loading/loading.component';
 import { BtnMyLcoationComponent } from './components/btn-my-lcoation/btn-my-lcoation.component';
+import { AngularLogoComponent } from './components/angular-logo/angular-logo.component';
 
 
 
@@ -12,7 +13,8 @@ import { BtnMyLcoationComponent } from './components/btn-my-lcoation/btn-my-lcoa
     MapScreenComponent,
     MapViewComponent,
     LoadingComponent,
-    BtnMyLcoationComponent
+    BtnMyLcoationComponent,
+    AngularLogoComponent
   ],
   imports: [
     CommonModule
