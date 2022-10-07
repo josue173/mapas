@@ -10,7 +10,6 @@ export class PlacesApiClient extends HttpClient {
 
   constructor(handler: HttpHandler) {
     super(handler);
-    // Permite personalizar el uso de peticiones HTTP
   }
 
   public override get<T>(
@@ -19,7 +18,7 @@ export class PlacesApiClient extends HttpClient {
       params?:
         | HttpParams
         | {
-            [params: string]:
+            [param: string]:
               | string
               | number
               | boolean
@@ -28,11 +27,12 @@ export class PlacesApiClient extends HttpClient {
     }
   ) {
     url = this.baseUrl + url;
+
     return super.get<T>(url, {
       params: {
         limit: 5,
         language: 'es',
-        accesToken: environment.apiKey,
+        access_token: environment.apiKey,
         ...options.params,
       },
     });
