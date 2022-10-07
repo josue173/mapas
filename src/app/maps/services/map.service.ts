@@ -1,7 +1,9 @@
 import { ThisReceiver } from '@angular/compiler';
 import { Injectable } from '@angular/core';
-import { LngLatLike, Map, Marker, Popup } from 'mapbox-gl';
+import { LngLatBounds, LngLatLike, Map, Marker, Popup } from 'mapbox-gl';
 import { Feature } from '../interfaces/places';
+import { DirectionsApiClient } from '../api/directionsApiClient';
+import { DirectionsResponse, Route } from '../interfaces/directions';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +15,8 @@ export class MapService {
   get isMapReady() {
     return !!this.map;
   }
+
+  constructor(private _directionsApi: DirectionsApiClient) {}
 
   setMap(map: Map) {
     this.map = map;
@@ -27,8 +31,9 @@ export class MapService {
     });
   }
 
-  createMarkersFromPlaces(places: Feature[]) {
+  createMarkersFromPlaces(places: Feature[], userLocation: [number, number]) {
     if (!this.map) throw Error('Mapa no inicializado');
+
     this.markers.forEach((marker) => marker.remove());
 
     const newMarkers = [];
@@ -47,7 +52,38 @@ export class MapService {
     }
 
     this.markers = newMarkers;
+    if (places.length === 0) return;
+
+    // Limites del mapa
+    const bounds = new LngLatBounds();
+    newMarkers.forEach((marker) => bounds.extend(marker.getLngLat()));
+    bounds.extend(userLocation);
+
+    this.map.fitBounds(bounds, {
+      padding: 200,
+    });
   }
 
-  constructor() {}
+  getRouterBetweenPoints(start: [number, number], end: [number, number]) {
+    this._directionsApi
+      .get<DirectionsResponse>(`/${start.join(',')};${end.join(',')}`)
+      .subscribe((resp) => this.drawPolyline(resp.routes[0]));
+  }
+
+  private drawPolyline(route: Route) {
+    console.log({
+      disttancia: route.distance / 1000,
+      duration: route.duration / 60,
+    });
+
+    if (!this.map) throw Error('No hay mapa');
+
+    const coords = route.geometry.coordinates;
+    const bounds = new LngLatBounds();
+    coords.forEach(([lng, lat]) => {
+      bounds.extend([lng, lat]);
+    });
+
+    this.map?.fitBounds(bounds, { padding: 200 });
+  }
 }
